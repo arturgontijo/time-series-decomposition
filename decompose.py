@@ -1,4 +1,5 @@
 import time
+import json
 
 import pandas as pd
 from pandas_datareader import data as pd_data
@@ -53,8 +54,13 @@ def main():
                                   epochs=epochs,
                                   batch_size=batch_size,
                                   input_dim=input_dim)
+
     result = forecast(model, input_seq, x, y, batch_size)
+    with open("result_{}_epochs.json".format(epochs), "w") as fd:
+        json.dump(result, fd, indent=4)
+
     model.save("LSTM_{}_epochs.model".format(epochs))
+
     return df, stl, model, result
     
     # t = Trainer(series=stl.seasonal,
