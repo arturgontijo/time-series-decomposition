@@ -123,7 +123,7 @@ def lstm_basic(x,
                                                                    time.time() - start))
     print("training took {0:.1f} sec".format(time.time() - start))
 
-    return z, input_seq
+    return z, trainer, input_seq
 
 
 def forecast(z, input_seq, x, y, batch_size):

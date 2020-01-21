@@ -50,16 +50,19 @@ def main():
     input_dim = 5
     output_dim = 5
     x, y = generate_data(stl.seasonal.values, time_steps=input_dim, time_shift=output_dim)
-    model, input_seq = lstm_basic(x, y,
-                                  epochs=epochs,
-                                  batch_size=batch_size,
-                                  input_dim=input_dim)
+    model, trainer, input_seq = lstm_basic(x, y,
+                                           epochs=epochs,
+                                           batch_size=batch_size,
+                                           input_dim=input_dim)
+    model.save("LSTM_{}_epochs.model".format(epochs))
+
+    # Loading Existing Model
+    # z = cntk.load_model("LSTM_{}_epochs.model".format(epochs))
+    # model = z(input_seq)
 
     result = forecast(model, input_seq, x, y, batch_size)
     with open("result_{}_epochs.json".format(epochs), "w") as fd:
         json.dump(result, fd, indent=4)
-
-    model.save("LSTM_{}_epochs.model".format(epochs))
 
     return df, stl, model, result
     
