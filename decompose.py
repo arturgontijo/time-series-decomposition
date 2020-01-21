@@ -32,7 +32,17 @@ def get_ticker_data(ticker, start_date, end_date):
     return pd.DataFrame()
 
 
-def get_stl(ticker, start_date, end_date):
+def get_csv_stl(file_path, col_name, period):
+    df = pd.read_csv(file_path)
+    if "Date" in df:
+        df.index = pd.to_datetime(df["Date"])
+    else:
+        df.index = pd.to_datetime(df.index)
+    df.sort_index(inplace=True)
+    return STL(df[col_name], period=period).fit()
+
+
+def get_ticker_stl(ticker, start_date, end_date):
     df = get_ticker_data(ticker, start_date, end_date)
     df.index = pd.to_datetime(df.index)
     df.sort_index(inplace=True)
@@ -41,10 +51,18 @@ def get_stl(ticker, start_date, end_date):
 
 
 def main():
-    ticker = input("Ticker: ")
-    start_date = input("Start Date: ")
-    end_date = input("End Date: ")
-    df, stl = get_stl(ticker, start_date, end_date)
+    opt = input("1=Ticker 2=CSV: ")
+    if opt == "1":
+        ticker = input("Ticker: ")
+        start_date = input("Start Date: ")
+        end_date = input("End Date: ")
+        df, stl = get_ticker_stl(ticker, start_date, end_date)
+    else:
+        file_path = input("File: ")
+        col_name = input("Column: ")
+        period = input("Period: ")
+        df, stl = get_csv_stl(file_path, col_name, int(period))
+
     epochs = 1000
     batch_size = 100
     input_dim = 5
