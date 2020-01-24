@@ -1,5 +1,5 @@
 registry = {
     "series_decomposition_service": {
-        "grpc": 7059,
+        "grpc": 7058,
     },
 }

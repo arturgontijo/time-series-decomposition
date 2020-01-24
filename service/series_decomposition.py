@@ -66,8 +66,14 @@ class DecompositionForecast:
             yield as_batch(x[ds], i, batch_size), as_batch(y[ds], i, batch_size)
 
     def run(self, series, period, epochs=1000, batch_size=100, input_dim=5):
+    
+        max_value = max(series)
+        min_value = min(series)
+        max_abs = max_value if max_value >= abs(min_value) else abs(min_value)
+        normalized_series = [x/(max_abs*10) for x in series]
+        normalized_series = np.array(normalized_series, dtype=np.float32)
+        stl = STL(normalized_series, period=period).fit()
 
-        stl = STL(series, period=period).fit()
         x, y = self.generate_data(stl.seasonal, time_steps=input_dim, time_shift=input_dim)
         x_axes = [cntk.Axis.default_batch_axis(), cntk.Axis.default_dynamic_axis()]
         cntk.input_variable(1, dynamic_axes=x_axes)
