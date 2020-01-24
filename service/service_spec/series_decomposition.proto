@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message Input {
+    repeated float series = 1;
+    int32 period = 2;
+    int32 test_portion = 3;
+}
+
+message Output {
+    repeated float observed = 1;
+    repeated float trend = 2;
+    repeated float seasonal = 3;
+    repeated float forecast = 4;
+}
+
+service Forecast {
+    rpc forecast(Input) returns (Output) {}
+}
