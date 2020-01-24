@@ -27,10 +27,7 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
     @staticmethod
     def forecast(request, _):
         df_obj = DecompositionForecast(Output)
-        response = df_obj.prepare_model(request.series,
-                                        request.epochs,
-                                        request.batch_size,
-                                        request.input_dim)
+        response = df_obj.prepare_model(request.series, request.period)
         log.info("forecast({},{})={}".format(len(request.series),
                                              len(response.seasonal),
                                              len(response.forecast)))
