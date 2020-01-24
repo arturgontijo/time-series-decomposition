@@ -65,15 +65,10 @@ class DecompositionForecast:
         for i in range(0, len(x[ds]) - batch_size, batch_size):
             yield as_batch(x[ds], i, batch_size), as_batch(y[ds], i, batch_size)
 
-    def prepare_model(self,
-                      series,
-                      period,
-                      epochs=1000,
-                      batch_size=100,
-                      input_dim=5):
+    def run(self, series, period, epochs=1000, batch_size=100, input_dim=5):
 
         stl = STL(series, period=period).fit()
-        x, y = self.generate_data(stl.seasonal.values, time_steps=input_dim, time_shift=input_dim)
+        x, y = self.generate_data(stl.seasonal, time_steps=input_dim, time_shift=input_dim)
         x_axes = [cntk.Axis.default_batch_axis(), cntk.Axis.default_dynamic_axis()]
         cntk.input_variable(1, dynamic_axes=x_axes)
     
@@ -112,7 +107,7 @@ class DecompositionForecast:
         res_dict = {"train": [], "val": [], "test": []}
         for j, ds in enumerate(["train", "val", "test"]):
             res_dict[ds] = []
-            for x1, y1 in self.next_batch(x, y, ds, batch_size):
+            for x1, y1 in self.next_batch(x, y, ds, batch_size=input_dim):
                 pred = z.eval({input_seq: x1})
                 res_dict[ds].extend(pred[:, 0])
 

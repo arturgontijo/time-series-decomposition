@@ -1,8 +1,10 @@
 import sys
-import logging
 
 import grpc
 import concurrent.futures as futures
+
+import multiprocessing
+import logging
 
 from service import common
 from service.series_decomposition import DecompositionForecast
@@ -13,6 +15,11 @@ from service.service_spec.series_decomposition_pb2 import Output
 
 logging.basicConfig(level=10, format="%(asctime)s - [%(levelname)8s] - %(name)s - %(message)s")
 log = logging.getLogger("series_decomposition")
+
+
+def mp_forecast(obj, request, return_dict):
+    return_dict["response"] = obj.run(request.series, request.period)
+    return
 
 
 # Create a class to be added to the gRPC server
@@ -26,8 +33,19 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
     # context: object that provides RPC-specific information (timeout, etc).
     @staticmethod
     def forecast(request, _):
-        df_obj = DecompositionForecast(Output)
-        response = df_obj.prepare_model(request.series, request.period)
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+    
+        p = multiprocessing.Process(target=mp_forecast, args=(DecompositionForecast(Output),
+                                                              request,
+                                                              return_dict))
+        p.start()
+        p.join()
+
+        response = return_dict.get("response", None)
+        if not response:
+            raise Exception("No Response!")
+
         log.info("forecast({},{})={}".format(len(request.series),
                                              len(response.seasonal),
                                              len(response.forecast)))
