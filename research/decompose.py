@@ -41,7 +41,7 @@ def get_csv_stl(file_path, col_name, period):
     return STL(df[col_name], period=period).fit()
 
 
-def get_ticker_stl(ticker, start_date, end_date):
+def get_ticker_stl(ticker, start_date, end_date, period):
     df = get_ticker_data(ticker, start_date, end_date)
     df.index = pd.to_datetime(df.index)
     df.sort_index(inplace=True)
@@ -51,7 +51,7 @@ def get_ticker_stl(ticker, start_date, end_date):
     max_abs = max_value if max_value >= abs(min_value) else abs(min_value)
     normalized_series = [x / (max_abs * 10) for x in df["Close"]]
     normalized_series = np.array(normalized_series, dtype=np.float32)
-    return df, STL(normalized_series, period=5).fit()
+    return df, STL(normalized_series, period=period).fit()
 
 
 def main():
@@ -60,18 +60,19 @@ def main():
         ticker = input("Ticker: ")
         start_date = input("Start Date: ")
         end_date = input("End Date: ")
-        df, stl = get_ticker_stl(ticker, start_date, end_date)
+        period = input("Period: ")
+        df, stl = get_ticker_stl(ticker, start_date, end_date, int(period))
     else:
         file_path = input("File: ")
         col_name = input("Column: ")
         period = input("Period: ")
         df, stl = get_csv_stl(file_path, col_name, int(period))
 
-    epochs = 1000
-    batch_size = 100
+    epochs = int(input("Epochs: "))
+    batch_size = int(input("BatchSize: "))
     input_dim = 5
     output_dim = 5
-    x, y = generate_data(stl.seasonal.values, time_steps=input_dim, time_shift=output_dim)
+    x, y = generate_data(stl.seasonal, time_steps=input_dim, time_shift=output_dim)
     model, trainer, input_seq = lstm_basic(x, y,
                                            epochs=epochs,
                                            batch_size=batch_size,
