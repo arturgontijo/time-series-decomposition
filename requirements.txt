@@ -2,5 +2,7 @@ git+git://github.com/statsmodels/statsmodels.git
 sklearn
 matplotlib
 seaborn
+pystan
+fbprophet
 pandas==0.23.4
 pandas_datareader==0.7.0
