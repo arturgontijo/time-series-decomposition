@@ -13,8 +13,8 @@ def analysis(file_name="",
              points=365,
              stl_period=5,
              invert=True,
-             normalize=False):
-
+             normalize=False,
+             norm_log=False):
     fn = file_name if file_name else input("CSV File: ")
     df = pd.read_csv(fn)
     if invert:
@@ -25,6 +25,8 @@ def analysis(file_name="",
         normalized_series = [x / max_value for x in df[target_col]]
         normalized_series = np.array(normalized_series, dtype=np.float32)
         df[target_col] = normalized_series
+    elif norm_log:
+        df[target_col] = np.log(df[target_col])
     # STL
     df2 = df[[target_col]]
     df2.index = df[ds_col]
