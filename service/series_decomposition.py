@@ -47,6 +47,7 @@ class DecompositionForecast:
         if len(ds) == 1:
             ticker = ds[0]
             df, stl = self.get_ticker_stl(ticker, period=period)
+            df = df.reset_index()
             ds = df["Date"].values
             y = df["Close"].values
         else:
