@@ -27,7 +27,7 @@ class DecompositionForecast:
         return self.output_msg(observed=stl.observed,
                                trend=stl.trend,
                                seasonal=stl.seasonal,
-                               forecast=forecast["yhat"],
-                               forecast_ds=forecast["ds"],
-                               forecast_lower=forecast["yhat_lower"],
-                               forecast_upper=forecast["yhat_upper"])
+                               forecast=forecast["yhat"].values,
+                               forecast_ds=forecast["ds"].values,
+                               forecast_lower=forecast["yhat_lower"].values,
+                               forecast_upper=forecast["yhat_upper"].values)

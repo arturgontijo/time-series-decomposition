@@ -12,7 +12,7 @@ message Output {
     repeated float trend = 2;
     repeated float seasonal = 3;
     repeated float forecast = 4;
-    repeated float forecast_ds = 5;
+    repeated string forecast_ds = 5;
     repeated float forecast_lower = 6;
     repeated float forecast_upper = 7;
 }

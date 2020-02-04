@@ -48,7 +48,7 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
         if not response:
             return Output()
 
-        log.info("forecast({},{})={}".format(len(request.series),
+        log.info("forecast({},{})={}".format(len(request.y),
                                              len(response.seasonal),
                                              len(response.forecast)))
         return response
