@@ -24,10 +24,14 @@ class DecompositionForecast:
         m.fit(df)
         future = m.make_future_dataframe(periods=points)
         forecast = m.predict(future)
+        forecast_df = []
+        for dt in forecast["ds"].values:
+            ts = pd.to_datetime(dt)
+            forecast_df.append(ts.strftime('%Y-%m-%d'))
         return self.output_msg(observed=stl.observed,
                                trend=stl.trend,
                                seasonal=stl.seasonal,
                                forecast=forecast["yhat"].values,
-                               forecast_ds=forecast["ds"].values,
+                               forecast_ds=forecast_df,
                                forecast_lower=forecast["yhat_lower"].values,
                                forecast_upper=forecast["yhat_upper"].values)
