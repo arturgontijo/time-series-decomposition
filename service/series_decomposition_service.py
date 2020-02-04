@@ -18,9 +18,10 @@ log = logging.getLogger("series_decomposition")
 
 
 def mp_forecast(obj, request, return_dict):
-    if request.series and request.period:
-        return_dict["response"] = obj.run(request.series, request.period)
-    return
+    return_dict["response"] = obj.run(request.ds,
+                                      request.y,
+                                      request.period,
+                                      request.points)
 
 
 # Create a class to be added to the gRPC server
