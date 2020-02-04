@@ -19,6 +19,7 @@ class DecompositionForecast:
         log.info("Forecasting...")
         # Prophet
         df = pd.DataFrame(data={"ds": ds, "y": y})
+        df["ds"] = pd.to_datetime(df["ds"])
         m = Prophet()
         m.fit(df)
         future = m.make_future_dataframe(periods=points)

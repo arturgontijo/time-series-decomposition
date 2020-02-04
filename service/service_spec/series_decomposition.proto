@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 message Input {
-    repeated float ds = 1;
+    repeated string ds = 1;
     repeated float y = 2;
     int32 period = 3;
     int32 points = 4;
