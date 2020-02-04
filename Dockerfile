@@ -1,4 +1,4 @@
-FROM microsoft/cntk:2.5-gpu-python3.5-cuda9.0-cudnn7.0
+FROM ubuntu:18.04
 
 ARG git_owner="singnet"
 ARG git_repo="time-series-decomposition"
@@ -13,6 +13,9 @@ RUN apt-get update && \
     apt-get install -y apt-utils
 
 RUN apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
     curl \
     git \
     wget \
@@ -28,7 +31,7 @@ RUN cd ${SINGNET_REPOS} && \
     git clone -b ${git_branch} https://github.com/${git_owner}/${git_repo}.git
 
 RUN cd ${SINGNET_REPOS}/${git_repo}/${SERVICE_NAME} && \
-    /root/anaconda3/envs/cntk-py35/bin/python -m pip install -r requirements.txt && \
+    pip3 install -r requirements.txt && \
     sh buildproto.sh
 
 WORKDIR ${SINGNET_REPOS}/${git_repo}/${SERVICE_NAME}

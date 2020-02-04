@@ -18,7 +18,8 @@ log = logging.getLogger("series_decomposition")
 
 
 def mp_forecast(obj, request, return_dict):
-    return_dict["response"] = obj.run(request.series, request.period)
+    if request.series and request.period:
+        return_dict["response"] = obj.run(request.series, request.period)
     return
 
 
@@ -44,7 +45,7 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
 
         response = return_dict.get("response", None)
         if not response:
-            raise Exception("No Response!")
+            return Output()
 
         log.info("forecast({},{})={}".format(len(request.series),
                                              len(response.seasonal),

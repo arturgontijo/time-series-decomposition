@@ -3,7 +3,6 @@ syntax = "proto3";
 message Input {
     repeated float series = 1;
     int32 period = 2;
-    int32 test_portion = 3;
 }
 
 message Output {
@@ -11,6 +10,9 @@ message Output {
     repeated float trend = 2;
     repeated float seasonal = 3;
     repeated float forecast = 4;
+    repeated float forecast_ds = 5;
+    repeated float forecast_lower = 6;
+    repeated float forecast_upper = 7;
 }
 
 service Forecast {
