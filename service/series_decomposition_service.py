@@ -3,6 +3,9 @@ import sys
 import grpc
 import concurrent.futures as futures
 
+from grpc_health.v1 import health_pb2_grpc as heartb_pb2_grpc
+from grpc_health.v1 import health_pb2 as heartb_pb2
+
 import multiprocessing
 import logging
 
@@ -54,6 +57,12 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
         return response
 
 
+class HealthServicer(heartb_pb2_grpc.HealthServicer):
+    @staticmethod
+    def Check(_request, _context):
+        # SERVING = 1
+        return heartb_pb2.HealthCheckResponse(status=1)
+
 # The gRPC serve function.
 #
 # Params:
@@ -65,6 +74,7 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
 def serve(max_workers=10, port=7777):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     grpc_bt_grpc.add_ForecastServicer_to_server(ForecastServicer(), server)
+    heartb_pb2_grpc.add_HealthServicer_to_server(HealthServicer(), server)
     server.add_insecure_port("[::]:{}".format(port))
     return server
 

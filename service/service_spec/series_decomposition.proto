@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package series_decomposition;
+
 message Input {
     repeated string ds = 1;
     repeated float y = 2;

@@ -6,3 +6,6 @@ pystan
 fbprophet
 pandas==0.23.4
 pandas_datareader==0.7.0
+grpcio
+grpcio-tools
+grpcio-health-checking
