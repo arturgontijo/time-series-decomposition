@@ -41,9 +41,10 @@ class ForecastServicer(grpc_bt_grpc.ForecastServicer):
         manager = multiprocessing.Manager()
         return_dict = manager.dict()
     
-        p = multiprocessing.Process(target=mp_forecast, args=(DecompositionForecast(Output),
-                                                              request,
-                                                              return_dict))
+        p = multiprocessing.Process(target=mp_forecast,
+                                    args=(DecompositionForecast(Output),
+                                          request,
+                                          return_dict))
         p.start()
         p.join()
 
@@ -62,6 +63,7 @@ class HealthServicer(heartb_pb2_grpc.HealthServicer):
     def Check(_request, _context):
         # SERVING = 1
         return heartb_pb2.HealthCheckResponse(status=1)
+
 
 # The gRPC serve function.
 #

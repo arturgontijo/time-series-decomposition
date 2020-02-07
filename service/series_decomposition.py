@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pandas_datareader import data as pd_data
+import pandas_market_calendars as mcal
 
 from fbprophet import Prophet
 from statsmodels.tsa.seasonal import STL
@@ -33,13 +34,12 @@ class DecompositionForecast:
         print("yahoo is not reachable")
         return pd.DataFrame()
 
-    def get_ticker_stl(self, ticker, start_date="2000-01-01", end_date=None, period=5):
+    def get_ticker_stl(self, ticker, start_date="2015-01-01", end_date=None, period=5):
         if not end_date:
             end_date = datetime.datetime.now().date().strftime("%Y-%m-%d")
         df = self.get_ticker_data(ticker, start_date, end_date)
         df.index = pd.to_datetime(df.index)
         df.sort_index(inplace=True)
-        df = df.resample('W').last()
         return df, STL(df["Close"], period=period).fit()
 
     def run(self, ds, y, period=5, points=365):
@@ -50,15 +50,25 @@ class DecompositionForecast:
             df = df.reset_index()
             ds = df["Date"].values
             y = df["Close"].values
+            financial = True
         else:
             stl = STL(y, period=period).fit()
+            financial = False
         log.info("Forecasting...")
         # Prophet
         df = pd.DataFrame(data={"ds": ds, "y": y})
         df["ds"] = pd.to_datetime(df["ds"])
         m = Prophet()
         m.fit(df)
-        future = m.make_future_dataframe(periods=points)
+        if financial:
+            nyse = mcal.get_calendar('NYSE')
+            start_date = datetime.datetime.today()
+            end_date = start_date + datetime.timedelta(days=points)
+            valid_days = nyse.valid_days(start_date=start_date, end_date=end_date)
+            future = pd.DataFrame(data={"ds": [v.date() for v in valid_days]})
+            future = pd.DataFrame(data={"ds": df["ds"].append(future["ds"], ignore_index=True)})
+        else:
+            future = m.make_future_dataframe(periods=points)
         forecast = m.predict(future)
         forecast_df = []
         for dt in forecast["ds"].values:
