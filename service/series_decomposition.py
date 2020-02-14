@@ -34,15 +34,24 @@ class DecompositionForecast:
         print("yahoo is not reachable")
         return pd.DataFrame()
 
-    def get_ticker_stl(self, ticker, start_date="2015-01-01", end_date=None, period=5):
+    def get_ticker_stl(self, ticker, start_date="2015-01-01", end_date=None, period=None):
         if not end_date:
             end_date = datetime.datetime.now().date().strftime("%Y-%m-%d")
         df = self.get_ticker_data(ticker, start_date, end_date)
         df.index = pd.to_datetime(df.index)
         df.sort_index(inplace=True)
-        return df, STL(df["Close"], period=period).fit()
+        try:
+            # Try to use the input period, force 5 in failure.
+            stl = STL(df["Close"], period=period).fit()
+        except Exception as e:
+            print(e)
+            stl = STL(df["Close"], period=5).fit()
+        return df, stl
 
-    def run(self, ds, y, period=5, points=365):
+    def run(self, ds, y, period, points):
+        if (period and period > 300) or (points and points > 500):
+            return self.output_msg(forecast_ds=["Too many forecast or period points! (max 3000)"])
+
         # Financial Series, first element of ds must by the Ticker
         if len(ds) == 1:
             ticker = ds[0]
@@ -52,7 +61,12 @@ class DecompositionForecast:
             y = df["Close"].values
             financial = True
         else:
-            stl = STL(y, period=period).fit()
+            try:
+                # Try to use the input period, force 5 in failure.
+                stl = STL(y, period=period).fit()
+            except Exception as e:
+                print(e)
+                stl = STL(y, period=5).fit()
             financial = False
         log.info("Forecasting...")
         # Prophet
